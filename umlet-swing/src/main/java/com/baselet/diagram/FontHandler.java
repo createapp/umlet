@@ -3,6 +3,7 @@ package com.baselet.diagram;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.font.FontRenderContext;
+import java.awt.geom.AffineTransform;
 
 import com.baselet.control.StringStyle;
 import com.baselet.control.basics.geom.DimensionDouble;
@@ -158,7 +159,9 @@ public class FontHandler {
 		}
 		double fontSize = getFontSize(applyZoom);
 		FormattedFont formattedFont = new FormattedFont(singleLine, fontSize, getFont(applyZoom), g2.getFontRenderContext());
-		fontrenderContext = g2.getFontRenderContext(); // TODO workaround to make sure getTextSize works without a graphics object
+		if (!isRotated(g2.getTransform())) { // rotated text (textrotation=...) must not change the context which is used to measure unrotated text
+			fontrenderContext = g2.getFontRenderContext(); // TODO workaround to make sure getTextSize works without a graphics object
+		}
 
 		if (align == AlignHorizontal.CENTER) {
 			x = (int) (x - formattedFont.getWidth() / 2);
@@ -168,6 +171,10 @@ public class FontHandler {
 		}
 
 		g2.drawString(formattedFont.getAttributedCharacterIterator(), (float) x, (float) y);
+	}
+
+	private static boolean isRotated(AffineTransform transform) {
+		return (transform.getType() & (AffineTransform.TYPE_QUADRANT_ROTATION | AffineTransform.TYPE_GENERAL_ROTATION)) != 0;
 	}
 
 	public static DimensionDouble getTextSizeStatic(FormattedFont formattedFont) {

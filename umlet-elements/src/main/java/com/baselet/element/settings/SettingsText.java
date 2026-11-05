@@ -7,6 +7,7 @@ import com.baselet.control.enums.ElementStyle;
 import com.baselet.element.facet.Facet;
 import com.baselet.element.facet.Settings;
 import com.baselet.element.facet.common.SeparatorLineFacet;
+import com.baselet.element.facet.common.TextRotationFacet;
 
 public class SettingsText extends Settings {
 
@@ -17,7 +18,7 @@ public class SettingsText extends Settings {
 
 	@Override
 	protected List<Facet> createFacets() {
-		return listOf(Settings.MANUALRESIZE, SeparatorLineFacet.INSTANCE);
+		return listOf(Settings.MANUALRESIZE, SeparatorLineFacet.INSTANCE, TextRotationFacet.INSTANCE);
 	}
 
 	@Override

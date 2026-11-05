@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import com.baselet.control.basics.XValues;
+import com.baselet.control.basics.geom.PointDouble;
 import com.baselet.control.enums.LineType;
 import com.baselet.diagram.draw.DrawHandler;
 import com.baselet.diagram.draw.DrawHandler.Layer;
@@ -43,7 +44,10 @@ public class SeparatorLineFacet extends Facet {
 		drawer.setLayer(Layer.Foreground); // should be always on top of background
 		double linePos = state.getTextPrintPosition() - drawer.textHeightMax() + Y_SPACE / 2;
 		XValues xPos = state.getXLimits(linePos);
-		drawer.drawLine(xPos.getLeft() + 0.5, linePos, xPos.getRight() - 1, linePos);
+		// the line separates text, therefore it is drawn in the (possibly rotated) text area
+		PointDouble start = state.textAreaToElement(xPos.getLeft() + 0.5, linePos);
+		PointDouble end = state.textAreaToElement(xPos.getRight() - 1, linePos);
+		drawer.drawLine(start.getX(), start.getY(), end.getX(), end.getY());
 		state.increaseTextPrintPosition(Y_SPACE);
 		drawer.setLayer(Layer.Background);
 		drawer.setLineType(ltBefore);

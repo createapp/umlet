@@ -15,6 +15,7 @@ import com.baselet.control.constants.FacetConstants;
 import com.baselet.control.enums.AlignHorizontal;
 import com.baselet.control.enums.FormatLabels;
 import com.baselet.control.enums.LineType;
+import com.baselet.control.enums.TextRotation;
 import com.baselet.diagram.draw.helper.ColorOwn;
 import com.baselet.diagram.draw.helper.ColorOwn.Transparency;
 import com.baselet.diagram.draw.helper.Style;
@@ -301,6 +302,23 @@ public abstract class DrawHandler {
 
 	public void print(StringStyle singleLine, double x, double y, AlignHorizontal align) {
 		printHelper(new StringStyle[] { singleLine }, new PointDouble(x, y), align);
+	}
+
+	/**
+	 * prints a single line which is rotated around the given point.
+	 * point and align are interpreted like in the unrotated print methods, but in reading direction of the rotated text
+	 * (e.g. if the text is rotated by 90 degrees, AlignHorizontal.LEFT means the line starts at the point and continues upwards)
+	 *
+	 * @param singleLine single line (no \n), no further processing of the String takes place.
+	 * @param point the position of the start (LEFT), center (CENTER) or end (RIGHT) of the baseline
+	 * @param align the alignment in reading direction
+	 * @param rotation the counter-clockwise rotation of the text around the point
+	 */
+	public void print(StringStyle singleLine, PointDouble point, AlignHorizontal align, TextRotation rotation) {
+		TextRotation rotationBefore = style.getTextRotation();
+		style.setTextRotation(rotation); // the implementations of printHelper store the style of the call, so the rotation only affects this call
+		printHelper(new StringStyle[] { singleLine }, point, align);
+		style.setTextRotation(rotationBefore);
 	}
 
 	/**

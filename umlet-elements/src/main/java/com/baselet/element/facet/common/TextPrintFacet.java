@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.baselet.control.StringStyle;
 import com.baselet.control.basics.XValues;
+import com.baselet.control.basics.geom.PointDouble;
 import com.baselet.control.enums.AlignHorizontal;
 import com.baselet.control.enums.AlignVertical;
 import com.baselet.control.enums.ElementStyle;
@@ -46,7 +47,7 @@ public class TextPrintFacet extends Facet {
 		double spaceForText = state.getXLimitsForArea(state.getTextPrintPosition(), drawer.textHeightMax(), false).getSpace() - drawer.getDistanceBorderToText() * 2;
 		StringStyle[] wrappedLine = TextSplitter.splitStringAlgorithm(line, spaceForText, drawer);
 		int lineIndex = 0;
-		while (state.getTextPrintPosition() < state.getGridElementSize().height && lineIndex < wrappedLine.length) {
+		while (state.getTextPrintPosition() < state.getTextAreaSize().height && lineIndex < wrappedLine.length) {
 			double currentSpaceForText = state.getXLimitsForArea(state.getTextPrintPosition(), drawer.textHeightMax(), false).getSpace() - drawer.getDistanceBorderToText() * 2;
 			// if the space for the text has changed recalculate the remaining word wrap
 			if (Math.abs(currentSpaceForText - spaceForText) >= .0000001) { // compare with small range (findbugs FE_FLOATING_POINT_EQUALITY)
@@ -61,12 +62,14 @@ public class TextPrintFacet extends Facet {
 
 	private static void printLine(StringStyle line, DrawHandler drawer, PropertiesParserState state) {
 		XValues xLimitsForText = state.getXLimitsForArea(state.getTextPrintPosition(), drawer.textHeightMax(), false);
-		Double spaceNotUsedForText = state.getGridElementSize().width - xLimitsForText.getSpace();
+		Double spaceNotUsedForText = state.getTextAreaSize().width - xLimitsForText.getSpace();
 		if (!spaceNotUsedForText.equals(Double.NaN)) { // NaN is possible if xlimits calculation contains e.g. a division by zero
 			state.updateMinimumWidth(spaceNotUsedForText + drawer.textWidth(line));
 		}
 		AlignHorizontal hAlign = state.getAlignment().getHorizontal();
-		drawer.print(line, calcHorizontalTextBoundaries(xLimitsForText, drawer.getDistanceBorderToText(), hAlign), state.getTextPrintPosition(), hAlign);
+		// the text is laid out in the (possibly rotated) text area, therefore the print position must be mapped to element coordinates
+		PointDouble printPosition = state.textAreaToElement(calcHorizontalTextBoundaries(xLimitsForText, drawer.getDistanceBorderToText(), hAlign), state.getTextPrintPosition());
+		drawer.print(line, printPosition, hAlign, state.getTextRotation());
 		state.increaseTextPrintPosition(drawer.textHeightMaxWithSpace());
 	}
 
@@ -92,10 +95,10 @@ public class TextPrintFacet extends Facet {
 			returnVal += drawer.getDistanceBorderToText() + state.getBuffer().getTop();
 		}
 		else if (state.getAlignment().getVertical() == AlignVertical.CENTER) {
-			returnVal += (state.getGridElementSize().height - state.getTotalTextBlockHeight()) / 2 + state.getBuffer().getTop() / 2;
+			returnVal += (state.getTextAreaSize().height - state.getTotalTextBlockHeight()) / 2 + state.getBuffer().getTop() / 2;
 		}
 		else /* if (state.getvAlign() == AlignVertical.BOTTOM) */ {
-			returnVal += state.getGridElementSize().height - state.getTotalTextBlockHeight() - drawer.textHeightMax() / 4; // 1/4 of textheight is a good value for large fontsizes and "deep" characters like "y"
+			returnVal += state.getTextAreaSize().height - state.getTotalTextBlockHeight() - drawer.textHeightMax() / 4; // 1/4 of textheight is a good value for large fontsizes and "deep" characters like "y"
 		}
 		return returnVal;
 	}
@@ -114,7 +117,7 @@ public class TextPrintFacet extends Facet {
 			double availableWidthSpace = state.getXLimitsForArea(displacement, textHeight, true).getSpace() - BUFFER;
 			double accumulator = displacement;
 			int maxLoops = 1000;
-			while (accumulator < state.getGridElementSize().height && !TextSplitter.checkifStringFitsNoWordwrap(firstLine, availableWidthSpace, drawer)) {
+			while (accumulator < state.getTextAreaSize().height && !TextSplitter.checkifStringFitsNoWordwrap(firstLine, availableWidthSpace, drawer)) {
 				if (maxLoops-- < 0) {
 					throw new RuntimeException("Endless loop during calculation of top displacement");
 				}

@@ -36,6 +36,11 @@ public class PropertiesParser {
 		if (state.getElementStyle() == ElementStyle.AUTORESIZE) { // only in case of autoresize element, calculate the elementsize
 			double width = state.getMinimumWidth();
 			double height = state.getTextPrintPosition();
+			if (state.getTextRotation().swapsWidthAndHeight()) { // the size has been calculated for the rotated text area
+				double textAreaWidth = width;
+				width = height;
+				height = textAreaWidth;
+			}
 			element.handleAutoresize(new DimensionDouble(width, height), state.getAlignment().getHorizontal());
 		}
 

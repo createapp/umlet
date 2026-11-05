@@ -5,7 +5,9 @@ import java.util.Map;
 
 import com.baselet.control.basics.XValues;
 import com.baselet.control.basics.geom.Dimension;
+import com.baselet.control.basics.geom.PointDouble;
 import com.baselet.control.enums.ElementStyle;
+import com.baselet.control.enums.TextRotation;
 import com.baselet.diagram.draw.DrawHandler;
 import com.baselet.element.sticking.polygon.SimpleStickingPolygonGenerator;
 import com.baselet.element.sticking.polygon.StickingPolygonGenerator;
@@ -28,6 +30,7 @@ public class PropertiesParserState {
 	private ElementStyle elementStyle;
 	private StickingPolygonGenerator stickingPolygonGenerator = SimpleStickingPolygonGenerator.INSTANCE;
 	private double totalTextBlockHeight;
+	private TextRotation textRotation;
 	private final Map<Class<? extends Facet>, Object> facetResponse = new HashMap<Class<? extends Facet>, Object>();
 
 	public PropertiesParserState(Settings settings, DrawHandler drawer) {
@@ -44,6 +47,7 @@ public class PropertiesParserState {
 		elementStyle = settings.getElementStyle();
 		stickingPolygonGenerator = SimpleStickingPolygonGenerator.INSTANCE;
 		this.totalTextBlockHeight = totalTextBlockHeight;
+		textRotation = TextRotation.DEG_0;
 		facetResponse.clear();
 		drawer.setEnableDrawing(enableDrawing);
 	}
@@ -74,8 +78,42 @@ public class PropertiesParserState {
 		return gridElementSize;
 	}
 
+	/**
+	 * the size of the area in which the text is laid out. It is the element size, with width and height swapped if the text is rotated by 90 or 270 degrees.
+	 * Text related positions (getTextPrintPosition(), getXLimits(), getTotalTextBlockHeight(), the buffer, ...) are coordinates of this area
+	 * @see #getTextRotation()
+	 * @see #textAreaToElement(double, double)
+	 */
+	public Dimension getTextAreaSize() {
+		if (textRotation.swapsWidthAndHeight()) {
+			return new Dimension(gridElementSize.height, gridElementSize.width);
+		}
+		return gridElementSize;
+	}
+
+	/**
+	 * maps a point of the text area to element coordinates (which are needed by the drawer)
+	 * @see #getTextAreaSize()
+	 */
+	public PointDouble textAreaToElement(double x, double y) {
+		return textRotation.toElementCoordinates(x, y, gridElementSize.width, gridElementSize.height);
+	}
+
+	public TextRotation getTextRotation() {
+		return textRotation;
+	}
+
+	public void setTextRotation(TextRotation textRotation) {
+		this.textRotation = textRotation;
+	}
+
+	/**
+	 * calculates the left and right x value of the text area for a certain y value of the text area.
+	 * If the text is rotated, the shape of the element is assumed to be symmetric like a rectangle or an ellipse (the text area of a rotated ellipse is the same ellipse with swapped width and height)
+	 */
 	public XValues getXLimits(double linePos) {
-		XValues xLimits = settings.getXValues(linePos, getGridElementSize().height, getGridElementSize().width);
+		Dimension textAreaSize = getTextAreaSize();
+		XValues xLimits = settings.getXValues(linePos, textAreaSize.height, textAreaSize.width);
 		xLimits.addLeft(buffer.getLeft());
 		xLimits.subRight(buffer.getRight());
 		return xLimits;
