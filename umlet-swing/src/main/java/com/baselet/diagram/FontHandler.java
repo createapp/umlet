@@ -18,6 +18,7 @@ public class FontHandler {
 
 	private String diagramDefaultFontFamily = null;
 	private FontRenderContext fontrenderContext = new FontRenderContext(null, true, true);
+	private boolean replaceLogicalFonts = true; // see Config.getPhysicalFontFamily()
 
 	public FontHandler(DiagramHandler handler) {
 		this.handler = handler;
@@ -90,12 +91,27 @@ public class FontHandler {
 	}
 
 	public Font getFont(boolean applyZoom) {
-		// Use the logical font to locate and return an instance of
-		// the matching physical font.
-
-		String fontFamily = Config.getInstance().getPhysicalFontFamily(
-			getDiagramDefaultFontFamily());
+		String fontFamily = getDiagramDefaultFontFamily();
+		if (replaceLogicalFonts) {
+			// Use the logical font to locate and return an instance of the matching physical font (#530)
+			fontFamily = Config.getInstance().getPhysicalFontFamily(fontFamily);
+		}
 		return new Font(fontFamily, Font.PLAIN, (int) getFontSize(applyZoom));
+	}
+
+	/**
+	 * Vector exports (SVG, PDF, EPS) need the logical font family because they map it to their own generic fonts
+	 * (e.g. Monospaced to font-family="monospace" in SVG or to Courier in PDF). A physical font like "Menlo" would
+	 * be written as is, which loses the generic fallback, so such exports use a copy which keeps the logical fonts.
+	 */
+	public FontHandler copyWithLogicalFonts() {
+		FontHandler copy = new FontHandler(handler);
+		copy.fontSize = fontSize;
+		copy.diagramDefaultSize = diagramDefaultSize;
+		copy.diagramDefaultFontFamily = diagramDefaultFontFamily;
+		copy.fontrenderContext = fontrenderContext;
+		copy.replaceLogicalFonts = false;
+		return copy;
 	}
 
 	public double getDistanceBetweenTexts() {

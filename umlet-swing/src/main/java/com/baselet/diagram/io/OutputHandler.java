@@ -68,14 +68,15 @@ public class OutputHandler {
 		for (GridElement ge : entities) {
 			ge.getDeprecatedAddons().doBeforeExport();
 		}
+		// vector formats must keep the logical fonts (see FontHandler.copyWithLogicalFonts())
 		if (extension.equals("eps")) {
-			exportEps(ostream, entities, diagramFont);
+			exportEps(ostream, entities, diagramFont.copyWithLogicalFonts());
 		}
 		else if (extension.equals("pdf")) {
-			exportPdf(ostream, entities, diagramFont);
+			exportPdf(ostream, entities, diagramFont.copyWithLogicalFonts());
 		}
 		else if (extension.equals("svg")) {
-			exportSvg(ostream, entities, diagramFont);
+			exportSvg(ostream, entities, diagramFont.copyWithLogicalFonts());
 		}
 		else if (isImageExtension(extension)) {
 			exportImg(extension, ostream, entities, diagramFont);
