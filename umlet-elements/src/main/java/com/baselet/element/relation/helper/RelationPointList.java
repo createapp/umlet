@@ -152,6 +152,26 @@ public class RelationPointList {
 		return new Line(begin, end);
 	}
 
+	public PointDouble getRelationCenter() {
+		List<Line> lines = getRelationPointLines();
+
+		double halfLength = getRelationHalfLength(lines);
+		if (halfLength == 0.0) { // if the line has 0 length, the start and end point are the same therefore return the start as center
+			return lines.get(0).getStart();
+		}
+
+		double currentLength = 0;
+		PointDouble relationMiddlePoint = null;
+		for (Line line : lines) {
+			currentLength += line.getLength();
+			if (halfLength < currentLength) {
+				relationMiddlePoint = line.getPointOnLineWithDistanceFrom(false, currentLength - halfLength);
+				break;
+			}
+		}
+		return relationMiddlePoint;
+	}
+
 	public Line getLastLine() {
 		return new Line(points.get(points.size() - 2).getPoint(), points.get(points.size() - 1).getPoint());
 	}
@@ -161,7 +181,7 @@ public class RelationPointList {
 	}
 
 	public Rectangle getDragBox() {
-		PointDouble center = getMiddleLine().getCenter();
+		PointDouble center = getRelationCenter();
 		double size = RelationPointConstants.DRAG_BOX_SIZE / 2;
 		Rectangle rectangle = new Rectangle(center.x - size, center.y - size, size * 2, size * 2);
 		return rectangle;
@@ -219,5 +239,13 @@ public class RelationPointList {
 			rectangleContainingAllPointsAndTextSpace = Rectangle.mergeToLeft(rectangleContainingAllPointsAndTextSpace, textSpace);
 		}
 		return rectangleContainingAllPointsAndTextSpace;
+	}
+
+	private double getRelationHalfLength(List<Line> lines) {
+		double totalLength = 0;
+		for (Line line : lines) {
+			totalLength += line.getLength();
+		}
+		return totalLength / 2;
 	}
 }
