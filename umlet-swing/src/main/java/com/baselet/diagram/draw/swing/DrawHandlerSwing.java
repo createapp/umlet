@@ -4,6 +4,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.Shape;
+import java.awt.geom.AffineTransform;
 import java.awt.geom.Arc2D;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Path2D;
@@ -206,7 +207,13 @@ public class DrawHandlerSwing extends DrawHandler {
 		g2.setColor(Converter.convert(col));
 		handler.getFontHandler().setFontSize(style.getFontSize());
 		g2.setFont(handler.getFontHandler().getFont());
+		AffineTransform transformBefore = g2.getTransform();
+		if (style.getTextRotation().isRotated()) {
+			// the angle is counter-clockwise, but Graphics2D rotates clockwise because the y axis points down
+			g2.rotate(-Math.toRadians(style.getTextRotation().getDegrees()), t.getX(), t.getY());
+		}
 		handler.getFontHandler().writeText(g2, t.getText(), t.getX(), t.getY(), t.getHorizontalAlignment());
+		g2.setTransform(transformBefore);
 		handler.getFontHandler().resetFontSize();
 	}
 

@@ -215,4 +215,35 @@ the usecase circle
 halign=LEFT</panel_attributes>
     <additional_attributes/>
   </element>
+  <element>
+    <id>UMLNote</id>
+    <coordinates>
+      <x>16</x>
+      <y>656</y>
+      <w>104</w>
+      <h>160</h>
+    </coordinates>
+    <panel_attributes>This note has the setting
+*textrotation=90*
+--
+The text reads from
+bottom to top. Alignment
+and style work as usual.
+textrotation=90</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>144</x>
+      <y>656</y>
+      <w>32</w>
+      <h>160</h>
+    </coordinates>
+    <panel_attributes>Text with textrotation=270
+halign=center
+valign=center
+textrotation=270</panel_attributes>
+    <additional_attributes/>
+  </element>
 </diagram>

@@ -2,6 +2,7 @@ package com.baselet.diagram.draw.helper;
 
 import com.baselet.control.constants.FacetConstants;
 import com.baselet.control.enums.LineType;
+import com.baselet.control.enums.TextRotation;
 
 public class Style {
 	private LineType lineType;
@@ -10,11 +11,13 @@ public class Style {
 	private ColorOwn backgroundColor;
 
 	private double fontSize;
+	private TextRotation textRotation;
 	private boolean applyZoom;
 
 	public Style() {
 		lineWidth = FacetConstants.LINE_WIDTH_DEFAULT;
 		lineType = LineType.SOLID;
+		textRotation = TextRotation.DEG_0;
 		applyZoom = true;
 	}
 
@@ -25,6 +28,7 @@ public class Style {
 		clone.foregroundColor = foregroundColor;
 		clone.backgroundColor = backgroundColor;
 		clone.fontSize = fontSize;
+		clone.textRotation = textRotation;
 		clone.applyZoom = applyZoom;
 		return clone;
 	}
@@ -69,6 +73,17 @@ public class Style {
 		return fontSize;
 	}
 
+	public void setTextRotation(TextRotation textRotation) {
+		this.textRotation = textRotation;
+	}
+
+	/**
+	 * @return the rotation of printed text around its print position
+	 */
+	public TextRotation getTextRotation() {
+		return textRotation;
+	}
+
 	public void setApplyZoom(boolean applyZoom) {
 		this.applyZoom = applyZoom;
 	}
@@ -90,6 +105,7 @@ public class Style {
 		temp = Double.doubleToLongBits(lineWidth);
 		result = prime * result + (int) (temp ^ temp >>> 32);
 		result = prime * result + (lineType == null ? 0 : lineType.hashCode());
+		result = prime * result + (textRotation == null ? 0 : textRotation.hashCode());
 		return result;
 	}
 
@@ -131,6 +147,9 @@ public class Style {
 			return false;
 		}
 		if (lineType != other.lineType) {
+			return false;
+		}
+		if (textRotation != other.textRotation) {
 			return false;
 		}
 		return true;

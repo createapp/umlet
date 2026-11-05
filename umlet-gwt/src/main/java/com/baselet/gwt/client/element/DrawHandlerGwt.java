@@ -6,6 +6,7 @@ import com.baselet.control.basics.geom.PointDouble;
 import com.baselet.control.enums.AlignHorizontal;
 import com.baselet.control.enums.FormatLabels;
 import com.baselet.control.enums.LineType;
+import com.baselet.control.enums.TextRotation;
 import com.baselet.diagram.draw.DrawFunction;
 import com.baselet.diagram.draw.DrawHandler;
 import com.baselet.diagram.draw.helper.ColorOwn;
@@ -193,9 +194,20 @@ public class DrawHandlerGwt extends DrawHandler {
 				PointDouble pToDraw = point;
 				ColorOwn fgColor = getOverlay().getForegroundColor() != null ? getOverlay().getForegroundColor() : styleAtDrawingCall.getForegroundColor();
 				ctx.setFillStyle(Converter.convert(fgColor));
+				TextRotation rotation = styleAtDrawingCall.getTextRotation();
+				if (rotation.isRotated()) {
+					ctx.save();
+					ctx.translate(point.x, point.y);
+					// the angle is counter-clockwise, but the canvas rotates clockwise because the y axis points down
+					ctx.rotate(-Math.toRadians(rotation.getDegrees()));
+					pToDraw = new PointDouble(0, 0);
+				}
 				for (StringStyle line : text) {
 					drawTextHelper(line, pToDraw, align, styleAtDrawingCall.getFontSize());
 					pToDraw = new PointDouble(pToDraw.getX(), pToDraw.getY() + textHeightMax());
+				}
+				if (rotation.isRotated()) {
+					ctx.restore();
 				}
 
 			}
