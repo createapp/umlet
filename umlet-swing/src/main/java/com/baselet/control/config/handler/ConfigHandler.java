@@ -43,6 +43,7 @@ public class ConfigHandler {
 	private static final String LAST_EXPORT_FORMAT = "last_export_format";
 	private static final String CHECK_FOR_UPDATES = "check_for_updates";
 	private static final String SECURE_XML_PROCESSING = "secure_xml_processing";
+	private static final String OSX_REPLACE_DEFAULT_FONTS = "osx_replace_default_fonts";
 	private static final String OPEN_FILE_HOME = "open_file_home";
 	private static final String SAVE_FILE_HOME = "save_file_home";
 	private static final String DEV_MODE = "dev_mode";
@@ -98,6 +99,7 @@ public class ConfigHandler {
 		cfg.setPdfExportFontBoldItalic(getStringProperty(props, PDF_EXPORT_FONT_BOLDITALIC, cfg.getPdfExportFontBoldItalic()));
 		cfg.setCheckForUpdates(getBoolProperty(props, CHECK_FOR_UPDATES, cfg.isCheckForUpdates()));
 		cfg.setSecureXmlProcessing(getBoolProperty(props, SECURE_XML_PROCESSING, cfg.isSecureXmlProcessing()));
+		cfg.setOsxReplaceDefaultFonts(getBoolProperty(props, OSX_REPLACE_DEFAULT_FONTS, cfg.isOsxReplaceDefaultFonts()));
 		cfg.setOpenFileHome(getStringProperty(props, OPEN_FILE_HOME, cfg.getOpenFileHome()));
 		cfg.setSaveFileHome(getStringProperty(props, SAVE_FILE_HOME, cfg.getSaveFileHome()));
 		SharedConfig.getInstance().setDev_mode(getBoolProperty(props, DEV_MODE, SharedConfig.getInstance().isDev_mode()));
@@ -174,6 +176,7 @@ public class ConfigHandler {
 			props.setProperty(LAST_EXPORT_FORMAT, cfg.getLastExportFormat());
 			props.setProperty(CHECK_FOR_UPDATES, Boolean.toString(cfg.isCheckForUpdates()));
 			props.setProperty(SECURE_XML_PROCESSING, Boolean.toString(cfg.isSecureXmlProcessing()));
+			props.setProperty(OSX_REPLACE_DEFAULT_FONTS, Boolean.toString(cfg.isOsxReplaceDefaultFonts()));
 			props.setProperty(OPEN_FILE_HOME, cfg.getOpenFileHome());
 			props.setProperty(SAVE_FILE_HOME, cfg.getSaveFileHome());
 			props.setProperty(DEV_MODE, Boolean.toString(SharedConfig.getInstance().isDev_mode()));

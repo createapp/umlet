@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.baselet.control.basics.geom.Dimension;
+import com.baselet.control.constants.Constants;
 import com.baselet.control.constants.SystemInfo;
 import com.baselet.control.enums.Os;
 import com.baselet.control.enums.Program;
@@ -49,6 +50,7 @@ public class Config {
 	private boolean show_grid = false;
 	private boolean start_maximized = false;
 	private boolean secureXmlProcessing = true;
+	private boolean osxReplaceDefaultFonts = true; // safety net for #530: allows users to switch back to the logical fonts if the replacement fonts cause problems
 	private String defaultFontFamily = Font.SANS_SERIF;
 	private Integer defaultFontsize = 14;
 	private Integer propertiesPanelFontsize = 11;
@@ -251,6 +253,28 @@ public class Config {
 
 	public void setStart_maximized(boolean start_maximized) {
 		this.start_maximized = start_maximized;
+	}
+
+	public boolean isOsxReplaceDefaultFonts() {
+		return osxReplaceDefaultFonts;
+	}
+
+	public void setOsxReplaceDefaultFonts(boolean osxReplaceDefaultFonts) {
+		this.osxReplaceDefaultFonts = osxReplaceDefaultFonts;
+	}
+
+	/**
+	 * Find the specific matching physical font if one is available (see {@link Constants#fontFamilyMap}), otherwise return the logical font.
+	 * The replacement can be disabled by setting osx_replace_default_fonts=false in the config file.
+	 */
+	public String getPhysicalFontFamily(String fontFamily) {
+		if (osxReplaceDefaultFonts) {
+			String physicalFontFamily = Constants.fontFamilyMap.get(fontFamily);
+			if (physicalFontFamily != null) {
+				return physicalFontFamily;
+			}
+		}
+		return fontFamily;
 	}
 
 	public String getDefaultFontFamily() {
